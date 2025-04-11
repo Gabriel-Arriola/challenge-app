@@ -21,6 +21,11 @@ spring:
     contexts: dev
   application:
     name: challenge-app
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
 
 springdoc:
   swagger-ui:
@@ -46,3 +51,4 @@ logging:
           autoconfigure:
             liquibase: DEBUG
     liquibase: TRACE
+
