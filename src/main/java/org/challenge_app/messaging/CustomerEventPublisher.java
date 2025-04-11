@@ -21,6 +21,7 @@ public class CustomerEventPublisher {
     @Value("${app.messaging.routing-key}")
     private String routingKey;
 
+
     public void publishCustomerCreatedEvent(CustomerResponse customer) {
         try{
             String message = objectMapper.writeValueAsString(customer);

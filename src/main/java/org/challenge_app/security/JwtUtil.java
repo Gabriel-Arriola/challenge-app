@@ -16,7 +16,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private final String SECRET_KEY = "mi_super_clave_hiper_segura_12345678";
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hora
 
     private final JwtParser jwtParser = Jwts.parser()  // en 0.12.x se construye así

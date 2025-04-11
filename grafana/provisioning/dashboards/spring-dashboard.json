@@ -1,0 +1,84 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": null,
+    "title": "Spring Boot Monitoring",
+    "tags": ["spring", "micrometer", "prometheus"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Clientes creados",
+        "targets": [
+          {
+            "expr": "customers_created_total",
+            "legendFormat": "clientes",
+            "interval": ""
+          }
+        ],
+        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+      },
+      {
+        "type": "graph",
+        "title": "Memoria usada (JVM)",
+        "targets": [
+          {
+            "expr": "jvm_memory_used_bytes{area=\"heap\"}",
+            "legendFormat": "heap"
+          },
+          {
+            "expr": "jvm_memory_used_bytes{area=\"nonheap\"}",
+            "legendFormat": "nonheap"
+          }
+        ],
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+      },
+      {
+        "type": "graph",
+        "title": "Threads activos",
+        "targets": [
+          {
+            "expr": "jvm_threads_live_threads",
+            "legendFormat": "threads"
+          }
+        ],
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+      },
+      {
+        "type": "graph",
+        "title": "Uptime de la aplicación",
+        "targets": [
+          {
+            "expr": "process_uptime_seconds",
+            "legendFormat": "uptime (s)"
+          }
+        ],
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+      },
+      {
+        "type": "graph",
+        "title": "Solicitudes HTTP",
+        "targets": [
+          {
+            "expr": "http_server_requests_seconds_count",
+            "legendFormat": "{{method}} {{uri}}"
+          }
+        ],
+        "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 }
+      },
+      {
+        "type": "graph",
+        "title": "Errores HTTP 500",
+        "targets": [
+          {
+            "expr": "http_server_requests_seconds_count{status=\"500\"}",
+            "legendFormat": "500 errors"
+          }
+        ],
+        "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 }
+      }
+    ],
+    "schemaVersion": 16,
+    "version": 1
+  }
+}

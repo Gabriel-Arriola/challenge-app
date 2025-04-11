@@ -1,5 +1,6 @@
 package org.challenge_app.service.impl;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.challenge_app.dto.CustomerMetricsResponse;
 import org.challenge_app.dto.CustomerResponse;
@@ -23,6 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final CustomerEventPublisher customerEventPublisher;
+    private final MeterRegistry meterRegistry;
 
     @Transactional
     public CustomerResponse createCustomer(CustomerRequest customerRequest) {
@@ -30,6 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer savedCustomer = customerRepository.save(customer);
         CustomerResponse customerResponse = customerMapper.toResponse(savedCustomer);
         customerEventPublisher.publishCustomerCreatedEvent(customerResponse);
+        meterRegistry.counter("customer.created").increment();
         return customerResponse;
     }
 

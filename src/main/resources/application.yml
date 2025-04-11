@@ -32,17 +32,16 @@ spring:
     username: guest
     password: guest
   mail:
-    # Para usar Gmail debes habilitar "App passwords" o permitir "apps menos seguras".
-    host: smtp.gmail.com
-    port: 587
-    username: tu-email@gmail.com
-    password: tu-contraseña
+    host: mailhog
+    port: 1025
+    username: ""
+    password: ""
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
+            enable: false
 
 app:
   messaging:
@@ -60,12 +59,6 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, metrics
-
 logging:
   level:
     org:
@@ -75,3 +68,11 @@ logging:
             liquibase: DEBUG
     liquibase: TRACE
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  metrics:
+    tags:
+      application: challenge-app
