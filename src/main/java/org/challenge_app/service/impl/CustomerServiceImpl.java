@@ -6,6 +6,7 @@ import org.challenge_app.dto.CustomerResponse;
 import org.challenge_app.dto.CustomerRequest;
 import org.challenge_app.dto.mapper.CustomerMapper;
 import org.challenge_app.exception.ResourceNotFoundException;
+import org.challenge_app.messaging.CustomerEventPublisher;
 import org.challenge_app.model.Customer;
 import org.challenge_app.repository.CustomerRepository;
 import org.challenge_app.service.CustomerService;
@@ -21,12 +22,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final CustomerEventPublisher customerEventPublisher;
 
     @Transactional
     public CustomerResponse createCustomer(CustomerRequest customerRequest) {
         Customer customer = customerMapper.toEntity(customerRequest);
         Customer savedCustomer = customerRepository.save(customer);
-        return customerMapper.toResponse(savedCustomer);
+        CustomerResponse customerResponse = customerMapper.toResponse(savedCustomer);
+        customerEventPublisher.publishCustomerCreatedEvent(customerResponse);
+        return customerResponse;
     }
 
     @Transactional(readOnly = true)

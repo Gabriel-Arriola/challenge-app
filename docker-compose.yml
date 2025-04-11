@@ -56,8 +56,23 @@ services:
     networks:
       - customer-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # Puerto para la aplicación
+      - "15672:15672"   # Interfaz web
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - customer-network
+
 volumes:
   postgres_data:
+  rabbitmq_data:
 
 networks:
   customer-network:

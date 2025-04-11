@@ -26,6 +26,17 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+app:
+  messaging:
+    exchange: customer-exchange
+    queue: customer-queue
+    routing-key: customer.created
 
 springdoc:
   swagger-ui:
