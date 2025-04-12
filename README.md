@@ -5,23 +5,32 @@ Todo el entorno puede ejecutarse con Docker Compose.
 
 ---
 
-## 🛠️ Tecnologías y herramientas utilizadas
+## 🧱 Decisiones arquitectónicas y patrones de diseño
+### 📐 Arquitectura
+1. [x] Arquitectura en capas: Separación clara entre controladores, servicios, repositorios, modelos y DTOs para favorecer la mantenibilidad, pruebas unitarias y escalabilidad.
+2. [x] Orientado a eventos: Uso de RabbitMQ para publicar y consumir eventos asíncronos (Customer creado → envío de email).
+3. [x] Configuración externa desacoplada: Uso de application.yml y variables de entorno vía docker-compose para ambientes separados (dev/test/prod).
+4. [x] Observabilidad incorporada: Se integra Spring Actuator con Prometheus para métricas y Grafana para visualización.
 
-| Herramienta                 | Descripción                                   |
-|-----------------------------|-----------------------------------------------|
-| **Java 17**                 | Lenguaje principal                            |
-| **Spring Boot 3.4.4**       | Framework de aplicación                       |
-| **Spring Data JPA**         | Persistencia con Hibernate                    |
-| **Spring Security + JWT**   | Seguridad y autenticación                     |
-| **MapStruct**               | Mapeo entre DTO y entidades                   |
-| **Liquibase**               | Control de versiones de la base de datos      |
-| **PostgreSQL / H2**         | Bases de datos para producción/test           |
-| **RabbitMQ**                | Procesamiento asíncrono de eventos            |
-| **Mailhog**                 | Captura de correos electrónicos en desarrollo |
-| **Prometheus + Grafana**    | Observabilidad y métricas                     |
-| **OpenAPI (Swagger)**       | Documentación interactiva de la API           |
-| **JUnit + Mockito**         | Pruebas unitarias y de integración            |
-| **Docker + Docker Compose** | Contenedorización del ecosistema              |
+### 🎯 Patrones de diseño aplicados
+1. [x] **DTO Pattern**: Se emplean objetos DTO para desacoplar la API del modelo de dominio y aplicar validaciones de entrada.
+2. [x] **Mapper Pattern** (con MapStruct): Transforma objetos DTO ↔ entidades de forma eficiente y declarativa.
+3. [x] **Builder Pattern** (con Lombok): Facilita la creación de objetos complejos (Request, Response, Entidades).
+4. [x] **Factory Method** (Spring Bean Factories): Se crean beans como CustomerMapper, RabbitTemplate, SecurityFilterChain desde clases de configuración.
+5. [x] **Strategy Pattern**: Aplicado en los filtros de autenticación JWT (OncePerRequestFilter) para definir comportamiento condicional en tiempo de ejecución.
+6. [x] **Observer/Event-driven Pattern**: RabbitMQ actúa como middleware entre Publisher y Listener desacoplados, facilitando la comunicación asíncrona.
+
+### ⚙️ Herramientas utilizadas
+* **Spring Boot**: Framework base para APIs REST y servicios web.
+* **Spring Data JPA**: Abstracción para persistencia con PostgreSQL.
+* **Liquibase**: Migraciones de base de datos versionadas.
+* **RabbitMQ**: Middleware de mensajería para eventos.
+* **MailHog**: Simulador de SMTP para pruebas de correo.
+* **JWT** (jjwt): Generación y validación de tokens de seguridad.
+* **Micrometer** + **Prometheus** + **Grafana**: Monitoreo y métricas del sistema.
+* **Swagger** (springdoc-openapi): Documentación automática de endpoints.
+* **JUnit** + **Mockito**: Suite de testing robusta para asegurar calidad del código.
+* **Docker Compose**: Orquestación de todos los servicios en contenedores.
 
 ---
 
@@ -61,7 +70,7 @@ challenge-app/
 ## 🚀 Funcionalidades destacadas
 
 ✅ Crear, obtener y listar clientes  
-✅ Consultar métricas de clientes 
+✅ Consultar métricas de clientes  
 ✅ Documentación Swagger  
 ✅ JWT con endpoint de autenticación (`/api/auth/token`)  
 ✅ Eventos asíncronos con RabbitMQ + envío de email  
@@ -82,7 +91,7 @@ challenge-app/
 
 ### 🐳 Despliegue con Docker Compose
 
-```bash
+```
 # Clonar el repositorio y ubicarse en la raíz
 git clone https://github.com/Gabriel-Arriola/challenge-app.git
 cd challenge-app
@@ -113,20 +122,16 @@ docker-compose up --build
    | GET    | /api/customers/metrics | Obtener métricas agregadas          |
 
 ### 🔐 Autenticación
-```bash
-Copy
+```
 curl -X POST "http://localhost:8080/api/auth/token?username=admin&password=password"
 ```
 ### Respuesta:
 ```json
-"Copy"
 {"token":"eyJhbGciOiJIUzI1NiJ9..."}
 ```
 
 ### Ejemplo de creación:
 ```
-bash
-Copy
 curl -X POST "http://localhost:8080/api/customers" \
 -H "Authorization: Bearer [TOKEN]" \
 -H "Content-Type: application/json" \
@@ -138,10 +143,48 @@ curl -X POST "http://localhost:8080/api/customers" \
 }'
 ```
 
+### 🧪 Ejecutar pruebas
+```
+./mvnw clean test
+```
+### Incluye:
+* Pruebas unitarias de servicios, mapeos, eventos y seguridad
+* Pruebas de integración con Spring Boot Test (@SpringBootTest)
+* Mocking de servicios con Mockito
+* Cobertura de controladores REST
+
 ### Nota: 
 #### Para desarrollo local, configurar los servicios dependientes o usar el perfil test con H2:
 ```
-bash
-Copy
 mvn spring-boot:run -Dspring.profiles.active=test
 ```
+
+### 📈 Monitoreo
+Prometheus
+Expone métricas en:
+```
+GET /actuator/prometheus
+```
+
+#### Métricas personalizadas:
+
+* customer.created → contador de clientes creados
+* http_server_requests_seconds_count → métricas HTTP
+
+### Grafana
+Dashboard preconfigurado disponible en:
+
+```
+http://localhost:3000
+```
+* Uso de memoria (JVM)
+* Errores 500
+* Clientes creados
+* Uptime de la aplicación
+
+### 📬 Notificaciones
+**Cada vez que se crea un nuevo cliente:**
+* Se publica un evento en RabbitMQ
+* Se consume en un listener asíncrono
+* Se envía un correo de notificación (capturado por MailHog)
+
